@@ -22,3 +22,30 @@ generation_prompt = ChatPromptTemplate.from_messages(
         MessagesPlaceholder(variable_name="messages"),
     ]
 )
+
+reflection_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a social media content grader and improviser, generate critique and recommendations for the user's tweet"
+            "Always provide detailed recommendations, including requests for length, virality, style, etc.",
+        ),
+        MessagesPlaceholder(variable_name="messages"),
+    ]
+)
+
+formatter_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You a social media content extractor"
+            "When a user provides you the paragraph which includes content and other suggestion, precisely extract and return the post content.",    
+        ),
+        MessagesPlaceholder(variable_name="messages"),
+    ]
+)
+
+llm = AzureChatOpenAI(temperature=0, model=OPENAI_MODEL, api_key=AZURE_OPENAI_API_KEY, api_version=OPENAI_API_VERSION, azure_endpoint=OPENAI_AZURE_ENDPOINT)
+generate_chain = generation_prompt | llm
+reflection_chain = reflection_prompt | llm
+formater_chain = formatter_prompt | llm

@@ -41,9 +41,8 @@ This project leverages the concept of a reflection agent to generate and enhance
 ## Usage
 
 1. Run the application:
-   ```bash
-   python main.py
-   ```
+   - start backend -> uvicorn backend:app --reload
+   - start front end -> streamlit run app.py
 
 2. Input your social media content when prompted.
 
@@ -59,11 +58,6 @@ We welcome contributions to make this project even better! Here’s how you can 
 
 ---
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
 
 ## Acknowledgments
 

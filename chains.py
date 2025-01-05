@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
 from langchain_openai import  AzureChatOpenAI
+from langchain.schema.output_parser import StrOutputParser
 
 load_dotenv()
 
@@ -34,18 +35,27 @@ reflection_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-formatter_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            "You a social media content extractor"
-            "When a user provides you the paragraph which includes content and other suggestion, precisely extract and return the post content.",    
-        ),
-        MessagesPlaceholder(variable_name="messages"),
-    ]
-)
+# formatter_prompt = ChatPromptTemplate.from_messages(
+#     [
+#         (
+#             "system",
+#             "You a social media content extractor"
+#             "When a user provides you the paragraph which includes content and other suggestion, precisely extract and return the post content.",    
+#         ),
+#         MessagesPlaceholder(variable_name="messages"),
+#     ]
+# )
+
+formater_prompt = """You are given unformatted content for the social media post. Format the content according to {social_media} post content.
+content: {post_content}
+
+Return ONLY the post content format according to social media mentioned.
+"""
+
+formater_prompt = PromptTemplate(input_variables=["social_media", "post_content"], template=formater_prompt)
+
 
 llm = AzureChatOpenAI(temperature=0, model=OPENAI_MODEL, api_key=AZURE_OPENAI_API_KEY, api_version=OPENAI_API_VERSION, azure_endpoint=OPENAI_AZURE_ENDPOINT)
 generate_chain = generation_prompt | llm
 reflection_chain = reflection_prompt | llm
-formater_chain = formatter_prompt | llm
+formater_chain = formater_prompt | llm | StrOutputParser()

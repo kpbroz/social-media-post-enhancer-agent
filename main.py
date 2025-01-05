@@ -9,6 +9,7 @@ from chains import generate_chain, reflection_chain, formater_chain
 REFLECT = "reflect"
 GENERATE = "generate"
 FORMATER = "formater"
+MEDIA = "Facebook"
 
 
 def generation_node(state: Sequence[BaseMessage]):
@@ -20,9 +21,9 @@ def reflection_node(messages: Sequence[BaseMessage]) -> List[BaseMessage]:
     return [HumanMessage(content=res.content)]
 
 def formater_node(messages: Sequence[BaseMessage]) -> str:
-    print(type(messages), len(messages))
-    res = messages[-1]
-    return formater_chain.invoke({"messages": HumanMessage(content=res)})
+    res_content = messages[-1].content  # Extract the content of the last message
+    return formater_chain.invoke(input = {"post_content": {res_content}, "social_media": {MEDIA}})
+
 
 builder = MessageGraph()
 builder.add_node(GENERATE, generation_node)
@@ -45,13 +46,14 @@ graph = builder.compile()
 graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
 
 
-if __name__ == "__main__":
+def get_post_content(post_content, media):
     print("Hello bvc!")
-    post_content = input("Please enter the content and context of the social media post you want generate: ")
-    social_media = input("Enter the social media platform: ")
-    inputs = HumanMessage(content=post_content)
+    # post_content = input("Please enter the content and context of the social media post you want generate: ")
+    # MEDIA = input("Enter the social media platform: ")
+    # inputs = HumanMessage(content=post_content)
+    MEDIA = media
     
-    inputs = HumanMessage(content=f"""{inputs}""")
+    inputs = HumanMessage(content=f"""{post_content}""")
     response = graph.invoke(inputs)
-    print(response)
+    return response[-1].content
 
